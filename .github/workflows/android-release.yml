@@ -23,15 +23,17 @@ jobs:
           gradle-version: 8.2
 
       - name: Decode Android keystore
+        working-directory: bible-blitz-android
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ${{ github.workspace }}/upload-keystore.jks
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
 
       - name: Create keystore.properties
+        working-directory: bible-blitz-android
         run: |
-          echo "storeFile=${{ github.workspace }}/upload-keystore.jks" > bible-blitz-android/keystore.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> bible-blitz-android/keystore.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> bible-blitz-android/keystore.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> bible-blitz-android/keystore.properties
+          echo "storeFile=upload-keystore.jks" > keystore.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> keystore.properties
 
       - name: Make gradlew executable
         working-directory: bible-blitz-android
