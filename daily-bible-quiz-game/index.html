@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
+    <title>Bible Blitz - Enhanced v3.0.0</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/styles.css">
+    
+    <!-- CreateJS Library (CDN) -->
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: #2c3e50;
+        }
+        
+        /* HUD Overlay */
+        #game-hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .hud-left, .hud-center, .hud-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        #coin-counter {
+            color: #FFD700;
+        }
+        
+        #level-display {
+            color: #4ECDC4;
+        }
+        
+        #streak-display {
+            color: #FF6B6B;
+        }
+        
+        #coin-reward-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 99;
+            transition: all 0.3s;
+        }
+        
+        #scripture-reference-hint {
+            display: none;
+        }
+        
+        /* Loading screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            #game-hud {
+                font-size: 14px;
+                padding: 10px;
+            }
+            
+            .hud-item {
+                padding: 6px 10px;
+                gap: 5px;
+            }
+            
+            .hud-left, .hud-center, .hud-right {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Bible Blitz...</div>
+        <div style="margin-top: 10px; font-size: 16px;">Enhanced v3.0.0</div>
+    </div>
+    
+    <!-- Game HUD -->
+    <div id="game-hud" style="display: none;">
+        <div class="hud-left">
+            <div class="hud-item" id="coin-counter">🪙 0</div>
+            <div class="hud-item" id="level-display">Level 1</div>
+        </div>
+        <div class="hud-center">
+            <div class="hud-item" id="timer-display">⏱️ 30s</div>
+        </div>
+        <div class="hud-right">
+            <div class="hud-item" id="streak-display">🔥 0 Day Streak</div>
+            <div class="hud-item" id="score-display">Score: 0</div>
+        </div>
+    </div>
+    
+    <!-- Coin Reward Indicator -->
+    <div id="coin-reward-indicator">+3 🪙</div>
+    
+    <!-- Scripture Reference Hint -->
+    <div id="scripture-reference-hint"></div>
+    
+    <!-- Main Canvas -->
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Configuration -->
+    <script src="config/game-config.js"></script>
+    <script src="config/questions.js"></script>
+    
+    <!-- Core Systems -->
+    <script src="src/orientation.js"></script>
+    <script src="src/browser-check.js"></script>
+    
+    <!-- NEW: Enhanced Systems -->
+    <script src="src/audio-manager.js"></script>
+    <script src="src/coin-system.js"></script>
+    <script src="src/level-system.js"></script>
+    <script src="src/hint-system.js"></script>
+    <script src="src/streak-system.js"></script>
+    <script src="src/survival-mode.js"></script>
+    
+    <!-- Game Core -->
+    <script src="src/loader.js"></script>
+    <script src="src/ui.js"></script>
+    <script src="src/ui-enhanced.js"></script>
+    <script src="src/game.js"></script>
+    
+    <!-- Additional Features -->
+    <script src="src/daily-challenge.js"></script>
+    <script src="src/monetization.js"></script>
+    <script src="src/viral.js"></script>
+    
+    <!-- Main App -->
+    <script src="src/app.js"></script>
+    
+    <!-- Initialize Enhanced Systems -->
+    <script>
+        // Global system instances
+        window.audioManager = null;
+        window.coinSystem = null;
+        window.levelSystem = null;
+        window.hintSystem = null;
+        window.streakSystem = null;
+        window.survivalMode = null;
+        
+        // Initialize all systems when app loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Bible Blitz Enhanced v3.0.0');
+            console.log('Initializing enhanced systems...');
+            
+            // Initialize systems
+            try {
+                window.audioManager = new AudioManager(GAME_CONFIG);
+                window.coinSystem = new CoinSystem(GAME_CONFIG);
+                window.levelSystem = new LevelSystem(GAME_CONFIG);
+                window.hintSystem = new HintSystem(GAME_CONFIG, window.coinSystem);
+                window.streakSystem = new StreakSystem(GAME_CONFIG, window.coinSystem);
+                window.survivalMode = new SurvivalMode(GAME_CONFIG);
+                
+                console.log('✅ All systems initialized successfully');
+                
+                // Update initial displays
+                window.coinSystem.updateDisplay();
+                window.levelSystem.updateDisplay();
+                window.streakSystem.updateDisplay();
+                
+                // Record daily play
+                window.streakSystem.recordPlay();
+                
+            } catch (error) {
+                console.error('Error initializing systems:', error);
+            }
+            
+            // Hide loading screen after 2 seconds
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 2000);
+        });
+        
+        // Update HUD every second
+        setInterval(() => {
+            if (window.coinSystem) {
+                window.coinSystem.updateDisplay();
+            }
+            if (window.levelSystem) {
+                window.levelSystem.updateDisplay();
+            }
+            if (window.streakSystem) {
+                window.streakSystem.updateDisplay();
+            }
+            if (window.hintSystem) {
+                window.hintSystem.updateHintButtons();
+            }
+            if (window.survivalMode && window.survivalMode.isActive()) {
+                window.survivalMode.updateUI();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
