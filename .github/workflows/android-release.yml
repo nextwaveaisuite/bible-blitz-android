@@ -28,17 +28,17 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "storeFile=../upload-keystore.jks" > daily-bible-quiz-android/keystore.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> daily-bible-quiz-android/keystore.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> daily-bible-quiz-android/keystore.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> daily-bible-quiz-android/keystore.properties
+          echo "storeFile=../upload-keystore.jks" > bible-blitz-android/keystore.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> bible-blitz-android/keystore.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> bible-blitz-android/keystore.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> bible-blitz-android/keystore.properties
 
       - name: Build signed AAB
-        working-directory: daily-bible-quiz-android
+        working-directory: bible-blitz-android
         run: ./gradlew clean bundleRelease
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
         with:
           name: BibleBlitz-SIGNED-AAB
-          path: daily-bible-quiz-android/app/build/outputs/bundle/release/*.aab
+          path: bible-blitz-android/app/build/outputs/bundle/release/*.aab
