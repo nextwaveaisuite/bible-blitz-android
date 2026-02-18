@@ -17,14 +17,29 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Gradle 8.2
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.2
-
-      - name: Decode Android keystore
+      - name: Decode Android keystore (safe)
+        shell: bash
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
+          set -e
+          rm -f upload-keystore.jks
+          printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
+          ls -lah upload-keystore.jks
+
+      - name: Verify keystore is valid
+        shell: bash
+        run: |
+          set -e
+          # Try JKS first, then PKCS12 (prints one of them working)
+          if keytool -list -keystore upload-keystore.jks -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" -storetype JKS >/dev/null 2>&1; then
+            echo "STORE_TYPE=JKS" >> $GITHUB_ENV
+            echo "✅ Keystore verified as JKS"
+          elif keytool -list -keystore upload-keystore.jks -storepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" -storetype PKCS12 >/dev/null 2>&1; then
+            echo "STORE_TYPE=PKCS12" >> $GITHUB_ENV
+            echo "✅ Keystore verified as PKCS12"
+          else
+            echo "❌ Keystore password/type invalid OR secret is not a real keystore."
+            exit 1
+          fi
 
       - name: Build signed AAB
         working-directory: daily-bible-quiz-android
@@ -33,12 +48,17 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          STORE_TYPE: ${{ env.STORE_TYPE }}
+        shell: bash
         run: |
-          gradle clean bundleRelease \
-            -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
-            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+          set -e
+          chmod +x ./gradlew
+          ./gradlew clean bundleRelease \
+            -Pandroid.injected.signing.store.file="$KEYSTORE_FILE" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+            -Pandroid.injected.signing.store.type="$STORE_TYPE"
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v4
