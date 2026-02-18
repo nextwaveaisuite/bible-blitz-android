@@ -33,6 +33,10 @@ jobs:
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> bible-blitz-android/keystore.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> bible-blitz-android/keystore.properties
 
+      - name: Make gradlew executable
+        working-directory: bible-blitz-android
+        run: chmod +x gradlew
+
       - name: Build signed AAB
         working-directory: bible-blitz-android
         run: ./gradlew clean bundleRelease
