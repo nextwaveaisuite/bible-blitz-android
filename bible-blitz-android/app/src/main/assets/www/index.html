@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Bible Blitz</title>
+  <style>
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+    /* Center canvas or game container */
+    #gameRoot {
+      width:100vw; height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      position:fixed; inset:0;
+      touch-action:none;
+      -webkit-user-select:none; user-select:none;
+    }
+    canvas { width:100vw; height:100vh; display:block; }
+  </style>
+</head>
+<body>
+  <div id="gameRoot">
+    <div style="color:#fff; font-family:system-ui; padding:20px; text-align:center; max-width:520px;">
+      <h2 style="margin:0 0 10px 0;">Bible Blitz</h2>
+      <p style="opacity:.9; line-height:1.4; margin:0;">
+        Your game files should be placed in:<br/>
+        <b>app/src/main/assets/www/</b><br/><br/>
+        Replace this file with your actual game <b>index.html</b>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
