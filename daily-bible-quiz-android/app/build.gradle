@@ -1,0 +1,72 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace "com.nextwaveaisuite.bibleblitz"
+    compileSdk 35
+
+    // Load keystore properties
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.nextwaveaisuite.bibleblitz"
+        minSdk 22
+        targetSdk 35
+        versionCode 1
+        versionName "1.0.0"
+
+        // Cordova needs this for some older multidex edge cases; safe even if unused.
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Cordova runtime (WebView wrapper)
+    implementation 'org.apache.cordova:framework:11.0.0'
+
+    // AppCompat + basic UI
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+
+    // WebView support libs
+    implementation 'androidx.webkit:webkit:1.10.0'
+
+    // Multidex (harmless even if not needed)
+    implementation 'androidx.multidex:multidex:2.0.1'
+}
